@@ -1,28 +1,43 @@
 package models
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"io/fs"
 	"log"
 
-	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
 )
 
 // Open will open a SQL connection with the provided
-// Postgres database. Callers of Open need to ensure
-// that the connection is eventually closed via the
-// db.Close() method.
-func Open(config PostgresConfig) (*sql.DB, error) {
-	db, err := sql.Open("pgx", config.String())
+// Postgres database. Callers of OpenSQLDB will be used
+// for migration purposes with the goose library.
+func OpenSQLDB(config PostgresConfig) (db *sql.DB, err error) {
+	db, err = sql.Open("pgx", config.String())
 	if err != nil {
 		return nil, fmt.Errorf("open: %w", err)
 	}
+	log.Println("Connected to database with *sql.DB for goose")
 	return db, nil
 }
 
-var db *sqlx.DB
+// InitPgxPool initializes a pgxpool.Pool for application logic
+func OpenPgxPool(config PostgresConfig) (*pgxpool.Pool, error) {
+	pool, err := pgxpool.New(context.Background(), config.String())
+	if err != nil {
+		return nil, err
+	}
+
+	if err := pool.Ping(context.Background()); err != nil {
+		return nil, err
+	}
+
+	log.Println("Connected to database with pgxpool for application logic")
+	return pool, nil
+}
 
 type PostgresConfig struct {
 	Host     string
@@ -37,10 +52,25 @@ func (cfg PostgresConfig) String() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database, cfg.SSLMode)
 }
 
-func initDB() {
-	var err error
-	db, err = sqlx.Connect("postgres", "user=youruser dbname=yourdb sslmode=disable")
+func Migrate(db *sql.DB, dir string) error {
+	err := goose.SetDialect("postgres")
 	if err != nil {
-		log.Fatalln(err)
+		return fmt.Errorf("migrate: %w", err)
 	}
+	err = goose.Up(db, dir)
+	if err != nil {
+		return fmt.Errorf("migrate: %w", err)
+	}
+	return nil
+}
+
+func MigrateFS(db *sql.DB, migrationsFS fs.FS, dir string) error {
+	if dir == "" {
+		dir = "."
+	}
+	goose.SetBaseFS(migrationsFS)
+	defer func() {
+		goose.SetBaseFS(nil)
+	}()
+	return Migrate(db, dir)
 }

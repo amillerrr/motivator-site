@@ -1,5 +1,14 @@
-<button hx-get="/quote" hx-target="#quote" class="btn btn-primary">
-    Get Motivational Quote
-</button>
-<div id="quote"></div>
+{{template "header" .}}
 
+{{define "quote"}}
+  <blockquote class="text-2xl italic font-semibold text-gray-900">
+    {{ if .CurrentMessage }}
+      "{{.CurrentMessage.Message}}"
+      <footer class="mt-4 text-gray-500 text-sm">- {{ if .CurrentMessage.Author }}{{.CurrentMessage.Author}}{{else}}Unknown{{end}}</footer>
+    {{ else }}
+      <p>No message available at the moment. Please try again later.</p>
+    {{ end }}
+  </blockquote>
+{{end}}
+
+{{template "footer" .}}
