@@ -8,78 +8,56 @@
   <meta name="description" content="Get your daily motivational quotes to keep you inspired and productive.">
   <meta property="og:title" content="Motivational Quotes" />
   <meta property="og:description" content="Get your daily motivational quotes to keep you inspired and productive." />
-  <title>Motivational Quotes</title>
-  <link href="/static/css/styles.css" rel="stylesheet">
-  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+  <title>Motivator</title>
+  <link rel="stylesheet" href="/assets/styles.css"/>
+  <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
 </head>
 
-<body class="bg-gray-100">
-  <div class="container mx-auto p-8 text-center">
-    <h1 class="text-4xl font-bold mb-8">Motivational Quotes {{if .Category}} - {{.Category}}{{end}}</h1>
-
-    <!-- Category Selection Buttons -->
-    <div class="flex justify-center space-x-4 mb-8">
-      <button 
-        hx-put="/set-category" 
-        hx-vals='{"category": "gratitude"}' 
-        hx-target="#category-input input"
-        hx-swap="outerHTML" 
-        aria-label="Select gratitude category"
-        class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-        Gratitude
-      </button>
-
-      <button 
-        hx-put="/set-category" 
-        hx-vals='{"category": "grit"}' 
-        hx-target="#category-input input"
-        hx-swap="outerHTML" 
-        aria-label="Select grit category"
-        class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-        Grit
-      </button>
-
-      <button 
-        hx-put="/set-category" 
-        hx-vals='{"category": "perseverance"}' 
-        hx-target="#category-input input"
-        hx-swap="outerHTML" 
-        aria-label="Select perseverance category"
-        class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-        Perseverance
-      </button>
-    </div>
-
-    <!-- Hidden input to store the selected category -->
-    <div id="category-input">
-      <input type="hidden" name="category" value="{{.Category}}">
-    </div>
-
-    <!-- Button to Generate New Quote based on the selected category -->
-    <button 
-      hx-get="/generate-quote" 
-      hx-target="#quote-container" 
-      hx-swap="outerHTML"
-      hx-include="#category-input input"
-      aria-label="Generate a new motivational quote"
-      class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-      Generate Quote
-    </button>
-
-    <!-- Quote Container -->
-    <section id="quote-container" class="mb-8" aria-live="polite" aria-label="Motivational Quote">
-      {{template "quote" .}}
-    </section>
-  </div>
-
-</body>
-
-</html>
+<body class="min-h-screen bg-[#ecf0f1]">
+  <header class="bg-[#3498db] text-[#2c3e50]">
+    <nav class="px-8 py-2 flex items-center">
+      <div class="">
+        <a href="/">
+          <img src="/static/images/logo2.webp" class="h-18 mx-8" alt="Motivator Logo" />
+        </a>
+      </div>
+      <div class="">
+        <a class="text-lg font-semibold hover:text-[#2c3e50] pr-8" href="#">Home</a>
+        <a class="text-lg font-semibold hover:text-[#2c3e50] pr-8" href="#">Contact</a>
+        <a class="text-lg font-semibold hover:text-[#2c3e50] pr-8" href="#">FAQ</a>
+      </div>
+    </nav>
+  </header>
 {{ end }}
 
+<!-- Each page's content goes here. -->
+
 {{define "footer"}}
-<!-- Footer content (if any) can be placed here -->
-<footer class="text-sm text-gray-500 mt-8">
-  © 2024 Motivational Quotes by mill3r.la All rights reserved.
+<footer class="bg-[#3498db]">
+  <div class="w-screen justify-center">
+    <!-- Brand Name -->
+    <span class="block whitespace-nowrap py-1 text-center text-2xl font-semibold text-[#2c3e50]">Motivator</span>
+    <!-- Navigation Links -->
+    <div class="grid h-1 grid-flow-row-dense grid-cols-4 gap-x-4 text-center">
+      <div>
+        <a href="#" class="col-span-1 hover:underline">Contact</a>
+      </div>
+      <div>
+        <a href="#" class="col-span-1 hover:underline">Privacy Policy</a>
+      </div>
+      <div>
+        <a href="#" class="col-span-1 hover:underline">Terms of Use</a>
+      </div>
+      <div>
+        <a href="#" class="col-span-1 hover:underline">Licensing</a>
+      </div>
+    </div>
+    <hr class="my-8 w-full border-[#2c3e50] px-6 sm:mx-auto" />
+    <span class="block text-center text-sm text-[#2c3e50]"> © 2024 <a href="/" class="h-1 hover:underline">mill3r.la™</a>. All Rights Reserved. </span>
+  </div>
 </footer>
+
+
+</body>
+</html>
 {{end}}

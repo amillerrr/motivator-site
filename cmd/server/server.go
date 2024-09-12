@@ -146,6 +146,7 @@ func routes(quotesC handlers.Quotes) http.Handler {
 
 	// Serve static files
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
 
 	return mux
 }

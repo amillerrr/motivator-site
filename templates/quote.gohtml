@@ -1,14 +1,78 @@
 {{template "header" .}}
 
+<div class="h-dvh justify-center">
+  <div class="container mx-auto p-8 text-center">
+    <h1 class="text-4xl text-[#2c3e50] font-sans font-bold mb-8">Motivational Quotes {{if .Category}} - {{.Category}}{{end}}</h1>
+
+    <!-- Category Selection Buttons -->
+    <div class="flex justify-center space-x-4 mb-8">
+      <button 
+        hx-put="/set-category" 
+        hx-vals='{"category": "gratitude"}' 
+        hx-target="#category-input input"
+        hx-swap="outerHTML" 
+        aria-label="Select gratitude category"
+        class="bg-[#1abc9c] text-white px-6 py-3 rounded-lg hover:bg-[#1abc9c] transition-colors duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#1abc9c] focus:ring-offset-2">
+        Gratitude
+      </button>
+
+      <button 
+        hx-put="/set-category" 
+        hx-vals='{"category": "grit"}' 
+        hx-target="#category-input input"
+        hx-swap="outerHTML" 
+        aria-label="Select grit category"
+        class="bg-[#1abc9c] text-white px-6 py-3 rounded-lg hover:bg-[#1abc9c] transition-colors duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#1abc9c] focus:ring-offset-2">
+        Grit
+      </button>
+
+      <button 
+        hx-put="/set-category" 
+        hx-vals='{"category": "perseverance"}' 
+        hx-target="#category-input input"
+        hx-swap="outerHTML" 
+        aria-label="Select perseverance category"
+        class="bg-[#1abc9c] text-white px-6 py-3 rounded-lg hover:bg-[#1abc9c] transition-colors duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#1abc9c] focus:ring-offset-2">
+        Perseverance
+      </button>
+    </div>
+
+    <!-- Hidden input to store the selected category -->
+    <div id="category-input">
+      <input type="hidden" name="category" value="">
+    </div>
+
+    <!-- Button to Generate New Quote based on the selected category -->
+    <button 
+      hx-get="/generate-quote" 
+      hx-target="#quote-container" 
+      hx-swap="innerHTML"
+      hx-include="#category-input input"
+      aria-label="Generate a new motivational quote"
+      class="bg-[#f39c12] text-white px-6 py-3 rounded-lg hover:bg-[#f39c12] transition-colors duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#f39c12] focus:ring-offset-2">
+      Generate Quote
+    </button>
+
+    <!-- Quote Container -->
+    <div class="flex justify-center">
+      <section id="quote-container" class="mt-8 bg-[#ecf0f1] shadow-md p-4 rounded-lg max-w-2xl w-full text-center" aria-live="polite" aria-label="Motivational Quote">
+        {{template "quote" .}}
+      </section>
+    </div>
+  </div>
+</div>
+
+{{template "footer" .}}
+
+
 {{define "quote"}}
-  <blockquote class="text-2xl italic font-semibold text-gray-900">
+  <blockquote class="text-2xl text-[#2c3e50] font-sans italic font-semibold">
     {{ if .CurrentMessage }}
       "{{.CurrentMessage.Message}}"
       <footer class="mt-4 text-gray-500 text-sm">- {{ if .CurrentMessage.Author }}{{.CurrentMessage.Author}}{{else}}Unknown{{end}}</footer>
     {{ else }}
-      <p>No message available at the moment. Please try again later.</p>
+      <p>You can either select a category or just select "Generate Quote" to pull a random quote.</p>
     {{ end }}
   </blockquote>
 {{end}}
 
-{{template "footer" .}}

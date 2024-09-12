@@ -15,11 +15,11 @@ services:
 
   tailwind:
     build:
-      context: ./static/tailwind
+      context: ./tailwind
       dockerfile: Dockerfile
     tty: true
     restart: always
     volumes:
-      - ./static/tailwind:/src
+      - ./tailwind:/src
       - ./assets:/dst
       - ./templates:/templates

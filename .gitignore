@@ -7,7 +7,7 @@
 *.dylib
 
 # Our specific binary
-lenslocked
+motivator
 
 # Images directory during development
 images/

@@ -22,23 +22,22 @@ type QuoteService struct {
 
 // FetchRandomQuote fetches a random quote from the database, optionally filtered by category.
 func (service *QuoteService) FetchRandomQuote(category string) (*Quote, error) {
-	quote := &Quote{
-		Category: category,
-	}
+	quote := &Quote{}
 
 	var query string
+	var err error
+
 	if category == "" {
-		// Fetch a random quote without any category filter
+		// Fetch a random quote without any category filter (no arguments needed)
 		query = `SELECT author, message FROM quotes ORDER BY RANDOM() LIMIT 1`
+		err = service.DB.QueryRow(context.Background(), query).Scan(&quote.Author, &quote.Message)
 	} else {
-		// Fetch a random quote filtered by the given category
+		// Fetch a random quote filtered by the given category (one argument needed)
 		query = `SELECT author, message FROM quotes WHERE category=$1 ORDER BY RANDOM() LIMIT 1`
+		err = service.DB.QueryRow(context.Background(), query, category).Scan(&quote.Author, &quote.Message)
 	}
 
-	// Execute the query
-	err := service.DB.QueryRow(context.Background(), query, category).Scan(&quote.Author, &quote.Message)
 	if err != nil {
-		// Handle case where no rows are found
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, fmt.Errorf("no quotes found for category: %s", category)
 		}

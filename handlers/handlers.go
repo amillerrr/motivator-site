@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/amillerrr/motivator-site/models"
 )
@@ -85,21 +86,31 @@ func (q Quotes) SetCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `<input type="hidden" name="category" value="%s">`, category)
 }
 
-// GenerateQuoteHandler fetches and renders a quote based on the selected category via HTMX
 func (q Quotes) GenerateQuoteHandler(w http.ResponseWriter, r *http.Request) {
-	// Get the selected category from the hidden input
+	// Get the selected category from the hidden input (may be empty)
 	category := r.FormValue("category")
 
-	// Validate category (optional)
+	// Fetch a random quote if no category is provided
+	var quote *models.Quote
+	var err error
 	if category == "" {
-		http.Error(w, "Category is required", http.StatusBadRequest)
-		log.Println("GenerateQuoteHandler: missing category")
-		return
+		quote, err = q.QuoteService.FetchRandomQuote("")
+	} else {
+		quote, err = q.QuoteService.FetchRandomQuote(category)
 	}
 
-	// Fetch a random quote based on the category
-	quote, err := q.QuoteService.FetchRandomQuote(category)
 	if err != nil {
+		if strings.Contains(err.Error(), "no quotes found") {
+			log.Printf("No quotes found for category '%s'", category)
+			// Render a message if no quotes are found
+			w.Header().Set("Content-Type", "text/html")
+			fmt.Fprintf(w, `
+                <blockquote class="text-2xl italic font-semibold text-gray-900">
+                    No quotes available for the category '%s'. Please try a different category.
+                </blockquote>`, category)
+			return
+		}
+
 		http.Error(w, "Error fetching quote", http.StatusInternalServerError)
 		log.Printf("Error fetching quote for category '%s': %v", category, err)
 		return
