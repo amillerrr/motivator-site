@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
 
 	"github.com/amillerrr/motivator-site/handlers"
@@ -136,19 +137,19 @@ func runMigrations(sqlDB *sql.DB) error {
 }
 
 func routes(quotesC handlers.Quotes) http.Handler {
-	mux := http.NewServeMux()
+	r := chi.NewRouter()
 
 	// Define HTTP routes
-	mux.HandleFunc("/", quotesC.HomePageHandler)
-	mux.HandleFunc("/new-quote", quotesC.NewQuoteHandler)
-	mux.HandleFunc("/set-category", quotesC.SetCategoryHandler)
-	mux.HandleFunc("/generate-quote", quotesC.GenerateQuoteHandler)
+	r.Get("/", quotesC.HomePageHandler)
+	r.Post("/new-quote", quotesC.NewQuoteHandler) // Assuming you want POST for form submissions
+	r.Put("/set-category", quotesC.SetCategoryHandler)
+	r.Get("/generate-quote", quotesC.GenerateQuoteHandler)
 
 	// Serve static files
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	r.Handle("/assets/*", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
 
-	return mux
+	return r
 }
 
 func gracefulShutdown(srv *http.Server) error {
